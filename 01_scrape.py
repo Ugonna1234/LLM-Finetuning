@@ -4,14 +4,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import chromedriver_autoinstaller
 import os 
+
 chromedriver_autoinstaller.install()
 
 # Readme: This script is used to scrape a particular website and save its content to a txt.
 
 # Input
-website = "WEBSITE-URL"
+website = "https://www.dezeen.com/2024/06/02/mmnt-hotel-interior-acme-bwm/"
 wait_time = 50
-num_pages = 500
+num_pages = 10
+
+# Define the target directory for saving files
+target_directory = r"C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\scrape_data"
 
 # Extract the paragraph elements from the webpage
 def get_paragraphs(driver):
@@ -29,12 +33,11 @@ def get_title(driver):
     filename = f"{project_name}.txt"
     valid_filename = "".join(c for c in filename if c.isalnum() or c in (' ', '_', '-')).rstrip()
     valid_filename = valid_filename.replace(" ", "_")
-    directory = "scrape_data"
-    filepath = os.path.join(directory, valid_filename)
+    filepath = os.path.join(target_directory, valid_filename)
     if os.path.exists(filepath):
         print(f"File already exists: {filepath}. Skipping project.")
         return None
-    return valid_filename
+    return filepath
 
 # Navigate to the next project
 def next_project(driver):
@@ -58,9 +61,8 @@ def clean_paragraphs(paragraphs):
 # Save the scraped text
 def save_text(filepath, paragraphs):
     content = "\n\n".join(paragraphs)
-    directory = "scrape_data"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if not os.path.exists(target_directory):
+        os.makedirs(target_directory)
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(content)
 
@@ -71,14 +73,12 @@ i = 0
 while i < num_pages:
     try:
         # Get project title and check if we already scraped it
-        valid_filename = get_title(driver)
-        txt_file_name = valid_filename[:-3] + '.' + valid_filename[-3:]
-        filepath = os.path.join("scrape_data", txt_file_name)
-        if valid_filename is None or os.path.exists(filepath):
+        filepath = get_title(driver)
+        if filepath is None:
             next_project(driver)
             continue
 
-        print(f"\nTitle: {valid_filename}")
+        print(f"\nTitle: {os.path.basename(filepath)}")
 
         # Get text
         paragraphs = get_paragraphs(driver)
