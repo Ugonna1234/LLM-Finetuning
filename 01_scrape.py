@@ -2,20 +2,24 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-import chromedriver_autoinstaller
 import os 
-
-chromedriver_autoinstaller.install()
 
 # Readme: This script is used to scrape a particular website and save its content to a txt.
 
 # Input
-website = "https://www.dezeen.com/2024/06/02/mmnt-hotel-interior-acme-bwm/"
+website = "https://www.dezeen.com/2024/04/27/tuckey-design-studio-old-chapel/?li_source=LI&li_medium=rhs_block_1"
 wait_time = 50
 num_pages = 10
 
 # Define the target directory for saving files
 target_directory = r"C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\scrape_data"
+
+# Path to the existing Chrome profile
+chrome_profile_path = r"C:\Users\ohakimu\AppData\Local\Google\Chrome\User Data"
+
+# Chrome options to use existing profile
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument(f"user-data-dir={chrome_profile_path}")
 
 # Extract the paragraph elements from the webpage
 def get_paragraphs(driver):
@@ -67,7 +71,7 @@ def save_text(filepath, paragraphs):
         file.write(content)
 
 # Run 
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(options=chrome_options)
 driver.get(website)
 i = 0
 while i < num_pages:
