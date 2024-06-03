@@ -7,7 +7,7 @@ import os
 # Readme: This script is used to scrape a particular website and save its content to a txt.
 
 # Input
-website = "https://www.dezeen.com/2024/04/27/tuckey-design-studio-old-chapel/?li_source=LI&li_medium=rhs_block_1"
+website = "https://www.dezeen.com/2024/05/30/zaha-hadid-architects-yacht-club-nightclub-casino-bahamas-habacoa/"
 wait_time = 50
 num_pages = 10
 
