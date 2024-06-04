@@ -1,15 +1,16 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-import os 
+import os
 
 # Readme: This script is used to scrape a particular website and save its content to a txt.
 
 # Input
-website = "https://www.dezeen.com/2024/05/30/zaha-hadid-architects-yacht-club-nightclub-casino-bahamas-habacoa/"
+base_url = "https://www.grubstreet.com/tags/restaurant-review/?start="
+start_page = 0
+num_pages = 5  # Number of index pages to scrape
 wait_time = 50
-num_pages = 10
 
 # Define the target directory for saving files
 target_directory = r"C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\scrape_data"
@@ -23,16 +24,17 @@ chrome_options.add_argument(f"user-data-dir={chrome_profile_path}")
 
 # Extract the paragraph elements from the webpage
 def get_paragraphs(driver):
-    WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.ID, "single-content")))
-    text_body = driver.find_element(By.ID, "single-content")
-    paragraph_elements = text_body.find_elements(By.TAG_NAME, "p")
+    WebDriverWait(driver, wait_time).until(
+        EC.presence_of_all_elements_located((By.XPATH, "//*[@class='clay-paragraph' or @class='clay-paragraph_drop-cap']"))
+    )
+    paragraph_elements = driver.find_elements(By.XPATH, "//*[@class='clay-paragraph' or @class='clay-paragraph_drop-cap']")
     paragraphs = [p.text for p in paragraph_elements]
     return paragraphs
 
 # Extract the title element for each webpage
 def get_title(driver):
-    WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1.afd-title-big.afd-title-big--full.afd-title-big--bmargin-big.afd-relativeposition")))
-    title_element = driver.find_element(By.CSS_SELECTOR, "h1.afd-title-big.afd-title-big--full.afd-title-big--bmargin-big.afd-relativeposition")
+    WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.CSS_SELECTOR, "h1")))
+    title_element = driver.find_element(By.CSS_SELECTOR, "h1")
     project_name = title_element.text
     filename = f"{project_name}.txt"
     valid_filename = "".join(c for c in filename if c.isalnum() or c in (' ', '_', '-')).rstrip()
@@ -43,21 +45,15 @@ def get_title(driver):
         return None
     return filepath
 
-# Navigate to the next project
-def next_project(driver):
-    WebDriverWait(driver, wait_time).until(EC.presence_of_element_located((By.XPATH, '//*[@id="article-nav-next"]')))
-    next_button = driver.find_element(By.XPATH, '//*[@id="article-nav-next"]')
-    next_url = next_button.get_attribute("href")
-    driver.get(next_url)
-
 # Clean unwanted text
 def clean_paragraphs(paragraphs):
     cleaned_paragraphs = []
     for paragraph in paragraphs:
         paragraph = paragraph.strip()
+        # Exclude paragraphs with specific tags
+        if "<strong>" in paragraph:
+            continue
         # Only add paragraphs that are not empty and have 5 or more words
-        if paragraph.startswith("Text description provided by the architects."):
-            paragraph = paragraph.replace("Text description provided by the architects.", "").strip()
         if paragraph and len(paragraph.split()) >= 5:
             cleaned_paragraphs.append(paragraph)
     return cleaned_paragraphs
@@ -70,16 +66,29 @@ def save_text(filepath, paragraphs):
     with open(filepath, "w", encoding="utf-8") as file:
         file.write(content)
 
-# Run 
+# Get article URLs from the index pages
+def get_article_urls(driver):
+    article_urls = []
+    for page_num in range(start_page, start_page + num_pages):
+        url = f"{base_url}{page_num * 10}"  # Assuming 10 articles per page
+        driver.get(url)
+        article_elements = driver.find_elements(By.CLASS_NAME, "article")
+        for article in article_elements:
+            link_element = article.find_element(By.CSS_SELECTOR, "a.link-text")
+            article_url = link_element.get_attribute("href")
+            article_urls.append(article_url)
+    return article_urls
+
+# Run
 driver = webdriver.Chrome(options=chrome_options)
-driver.get(website)
-i = 0
-while i < num_pages:
+article_urls = get_article_urls(driver)
+
+for url in article_urls:
+    driver.get(url)
     try:
         # Get project title and check if we already scraped it
         filepath = get_title(driver)
         if filepath is None:
-            next_project(driver)
             continue
 
         print(f"\nTitle: {os.path.basename(filepath)}")
@@ -92,13 +101,9 @@ while i < num_pages:
         # Export to txt
         save_text(filepath, paragraphs)
 
-        # Move to next project
-        next_project(driver)
-        i += 1
-
     except Exception as e:
         print("Error: ", e)
-        break
+        continue
 
 # Close the WebDriver
 driver.quit()
