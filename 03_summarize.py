@@ -10,13 +10,13 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 # Input
-clean_text = "/dataset/clean_text.txt"
+clean_text = r"C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\dataset\clean_text.txt"
 
 # Define the LLM task
 task = "You are an API that converts bodies of text into a single summary paragraph." \
-        "Create a short summary paragraph of the building depicted in the following text." \
-        "Reference the architecture features, form, shape, materiality, program, relation to the site, etc"\
-        "Mention in the summary aspects related to the idea behind the concept of the design." \
+        "Create a brief summary paragraph for a restaurant based on the provided review text." \
+        "Reference key aspects such as the cuisine, atmosphere, service quality, notable dishes, location, and overall dining experience, etc"\
+        "Capture the essence of the reviewer's opinion and highlight any unique features or concepts behind the restaurant's design and culinary approach." \
         "You should only respond with a summary paragraph and no additional text."
 
 # Get summaries from LLM
@@ -53,7 +53,7 @@ for chunk in paragraphs:
         print(summary)
 
 # Export to txt file
-output_file = 'dataset/summary_text.txt'
+output_file = r'C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\dataset\summary_text.txt'
 with open(output_file, 'w') as file:
     for content in summaries:
         file.write(content + '\n\n')
