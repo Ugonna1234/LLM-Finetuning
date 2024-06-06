@@ -35,7 +35,7 @@ def generate_summary(task, chunk):
     return result
 
 # Run
-with open(clean_text, 'r') as file:
+with open(clean_text, 'r', encoding='utf-8') as file:  # Specify encoding
     content = file.read()
 
 # Split into paragraphs
@@ -52,7 +52,7 @@ for idx, chunk in enumerate(paragraphs):
 
 # Export to txt file
 output_file = r'C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\dataset\summary_text.txt'
-with open(output_file, 'w') as file:
+with open(output_file, 'w', encoding='utf-8') as file:  # Specify encoding
     for content in summaries:
         file.write(content + '\n\n')
 
