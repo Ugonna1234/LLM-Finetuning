@@ -22,16 +22,19 @@ task = ("You are an API that converts bodies of text into a single summary parag
 
 # Get summaries from LLM
 def generate_summary(task, chunk):
-    response = client.completions.create(
-        model="gpt-4-turbo",
-        messages=[
-            {"role": "system", "content": task},
-            {"role": "user", "content": chunk}
+    response = client.chat.completions.create(
+    model="gpt-4-turbo",
+    messages=[
+        {"role": 
+            "system", 
+            "content": task},
+        {"role": 
+            "user", 
+            "content": chunk}
         ],
-        temperature=1.0,
-    )
+        temperature=1.0,)
     
-    result = response.choices[0]['message']['content']
+    result = response.choices[0].message.content
     return result
 
 # Run
@@ -52,7 +55,7 @@ for idx, chunk in enumerate(paragraphs):
 
 # Export to txt file
 output_file = r'C:\Users\ohakimu\OneDrive - Perkins and Will\Desktop\IAAC\Semester 3\Gen AI\LLM\LLM-Finetuning\dataset\summary_text.txt'
-with open(output_file, 'w', encoding='utf-8') as file:  # Specify encoding
+with open(output_file, 'w') as file:
     for content in summaries:
         file.write(content + '\n\n')
 
