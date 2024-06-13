@@ -55,7 +55,7 @@ westlake = [
 # Notice how this model is not running locally. It uses an OpenAI key.
 gpt4_turbo = [
         {
-            "model": "gpt-4-turbo-preview",
+            "model": "gpt-4-turbo",
             "api_key": OPENAI_API_KEY,
             "cache_seed": random.randint(0, 100000),
         }
