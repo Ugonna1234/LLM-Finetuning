@@ -11,31 +11,28 @@ openai_api_key = os.getenv('OPENAI_API_KEY', 'your-openai-api-key')
 # App config
 st.set_page_config(page_title="LM Studio Streaming Chatbot", page_icon="🤖")
 
-# Define CSS for the background GIF
-background_css = """
-<style>
-.background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    opacity: 1;
-    mix-blend-mode: multiply;
-}
+def add_bg_from_url():
+    st.markdown(
+         f"""
+         <style>
+         .stApp {{
+             background-image: url("");
+             background-attachment: fixed;
+             background-size: cover;
+             background-position: center;
+             background-repeat: no-repeat;
+             opacity: 1; /* Adjust opacity value (0.0 to 1.0) */
+             mix-blend-mode: multiply; /* Adjust blend mode as needed */
+         }}
+         </style>
+         """,       
+         unsafe_allow_html=True
+     )
 
-.background-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-</style>
-"""
+add_bg_from_url()
 
-# Display background GIF
-st.markdown(background_css, unsafe_allow_html=True)
-st.markdown('<div class="background-container"><img src="https://decider.com/wp-content/uploads/2016/05/chefs-table-ep5-potatoes.gif?w=619" alt="Background GIF"></div>', unsafe_allow_html=True)
+
+add_bg_from_url() 
 
 # Container for chatbot interface
 st.title("Restaurant Critic Streaming Chatbot")
