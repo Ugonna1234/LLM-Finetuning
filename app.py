@@ -1,23 +1,62 @@
-####
-#### Streamlit Streaming using LM Studio as OpenAI Standin
-#### run with `streamlit run app.py`
-
-# !pip install pypdf langchain langchain_openai 
-
 import streamlit as st
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-# app config
+# Load your OpenAI API key from environment variable or pass it directly
+import os
+openai_api_key = os.getenv('OPENAI_API_KEY', 'your-openai-api-key')
+
+# App config
 st.set_page_config(page_title="LM Studio Streaming Chatbot", page_icon="🤖")
-st.title("LM Studio Streaming Chatbot")
 
+# Define CSS for the background GIF
+background_css = """
+<style>
+.background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 1;
+    mix-blend-mode: multiply;
+}
+
+.background-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>
+"""
+
+# Display background GIF
+st.markdown(background_css, unsafe_allow_html=True)
+st.markdown('<div class="background-container"><img src="https://decider.com/wp-content/uploads/2016/05/chefs-table-ep5-potatoes.gif?w=619" alt="Background GIF"></div>', unsafe_allow_html=True)
+
+# Container for chatbot interface
+st.title("Restaurant Critic Streaming Chatbot")
+st.markdown("This is where the chatbot interface goes...")
+
+# Sidebar for LM Studio configuration
+st.sidebar.title('LM Studio Advanced Configuration')
+# Metadata and description of the model
+st.sidebar.markdown("### Model Information")
+st.sidebar.markdown("**Model Type**: froggeric/WestLake-10.7B-v2-GGUF")
+st.sidebar.markdown("**Description**: This model provides a general-purpose language model capable of generating human-like text based on given input.")
+
+##context_length = st.sidebar.slider('Context Length', min_value=20, max_value=200, value=100, step=10, help="The number of tokens (words) in the context provided to the model.")
+temperature = st.sidebar.slider('Temperature', min_value=0.1, max_value=2.0, value=0.7, step=0.1, help="Controls the randomness of predictions. Lower values make the model more deterministic, while higher values make it more random.")
+#tokens_to_generate = st.sidebar.slider('Tokens to Generate', min_value=10, max_value=100, value=50, step=10, help="Number of tokens (words) to generate in the response.")
+
+
+# Function to get chatbot response
 def get_response(user_query, chat_history):
-
     template = """
-    You are a helpful assistant. Answer the following questions considering the history of the conversation:
+    Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
     Chat history: {chat_history}
 
@@ -26,8 +65,8 @@ def get_response(user_query, chat_history):
 
     prompt = ChatPromptTemplate.from_template(template)
 
-    # Using LM Studio Local Inference Server
-    llm = ChatOpenAI(base_url="http://localhost:1234/v1")
+     # Using LM Studio Local Inference Server
+    llm = ChatOpenAI(base_url="http://localhost:1234/v1", openai_api_key=openai_api_key, model="froggeric/WestLake-10.7B-v2-GGUF", temperature=temperature)
 
     chain = prompt | llm | StrOutputParser()
     
@@ -39,10 +78,9 @@ def get_response(user_query, chat_history):
 # session state
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = [
-        AIMessage(content="Hello, I am a bot. How can I help you?"),
+        AIMessage(content="Hello"),
     ]
 
-    
 # conversation
 for message in st.session_state.chat_history:
     if isinstance(message, AIMessage):
@@ -64,3 +102,5 @@ if user_query is not None and user_query != "":
         response = st.write_stream(get_response(user_query, st.session_state.chat_history))
 
     st.session_state.chat_history.append(AIMessage(content=response))
+
+    
