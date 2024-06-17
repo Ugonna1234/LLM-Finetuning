@@ -36,14 +36,14 @@ add_bg_from_url()
 
 # Container for chatbot interface
 st.title("Restaurant Critic Streaming Chatbot")
-st.markdown("This is where the chatbot interface goes...")
+st.markdown("")
 
 # Sidebar for LM Studio configuration
 st.sidebar.title('LM Studio Advanced Configuration')
 # Metadata and description of the model
 st.sidebar.markdown("### Model Information")
-st.sidebar.markdown("**Model Type**: froggeric/WestLake-10.7B-v2-GGUF")
-st.sidebar.markdown("**Description**: This model provides a general-purpose language model capable of generating human-like text based on given input.")
+st.sidebar.markdown("**Model Type**: Rcritic-unsloth.Q8_0.GGUF")
+st.sidebar.markdown("**Description**: This model provides a culinary specific language model capable of generating human-like text based on given input.")
 
 ##context_length = st.sidebar.slider('Context Length', min_value=20, max_value=200, value=100, step=10, help="The number of tokens (words) in the context provided to the model.")
 temperature = st.sidebar.slider('Temperature', min_value=0.1, max_value=2.0, value=0.7, step=0.1, help="Controls the randomness of predictions. Lower values make the model more deterministic, while higher values make it more random.")
@@ -63,7 +63,7 @@ def get_response(user_query, chat_history):
     prompt = ChatPromptTemplate.from_template(template)
 
      # Using LM Studio Local Inference Server
-    llm = ChatOpenAI(base_url="http://localhost:1234/v1", openai_api_key=openai_api_key, model="froggeric/WestLake-10.7B-v2-GGUF", temperature=temperature)
+    llm = ChatOpenAI(base_url="http://localhost:1234/v1", openai_api_key=openai_api_key, model="Rcritic/content", temperature=temperature)
 
     chain = prompt | llm | StrOutputParser()
     
